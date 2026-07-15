@@ -4,7 +4,7 @@
  * Email: lizhenghao@shanghaitech.edu.cn
  * Institute: SIST
  * Created: 2025-05-29
- * Last Modified: 2026-07-13
+ * Last Modified: 2026-07-15
  */
 
 #include "io_context/io_context.hpp"
@@ -124,7 +124,7 @@ public:
     RCLCPP_INFO(this->get_logger(), "JointSerialComm node started, serial initialized on %s", port.c_str());
     async_receive();
 
-    home();
+    //home();
   }
 
 private:
