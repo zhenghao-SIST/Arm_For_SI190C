@@ -4,7 +4,7 @@
  * Email: lizhenghao@shanghaitech.edu.cn
  * Institute: SIST
  * Created: 2025-05-29
- * Last Modified: 2026-07-15
+ * Last Modified: 2026-07-16
  */
 
 #include "io_context/io_context.hpp"
@@ -77,7 +77,7 @@ public:
     this->declare_parameter<std::string>("serial_port", "/dev/Motor");
     this->declare_parameter<int>("baud_rate", 115200);
     this->declare_parameter<std::vector<long int>>("reducer_ratios", {30L, 50L, 20L, 20L, 20L, 1L});
-    this->declare_parameter<std::vector<long int>>("motor_directions", {0L, 0L, 0L, 0L, 1L, 0L});
+    this->declare_parameter<std::vector<long int>>("motor_directions", {0L, 0L, 0L, 0L, 0L, 0L});
     this->declare_parameter<std::vector<double>>("axis_directions", {-1.0, 1.0, -1.0, -1.0, 1.0, 1.0});
     this->declare_parameter<std::vector<long int>>("bipolar_joints", {0L, 0L, 0L, 0L, 1L, 0L});
 
