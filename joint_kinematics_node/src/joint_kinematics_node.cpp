@@ -4,7 +4,7 @@
  * Email: lizhenghao@shanghaitech.edu.cn
  * Institute: SIST
  * Created: 2025-04-29
- * Last Modified: 2026-07-14
+ * Last Modified: 2026-07-16
  */
 
 #include "joint_kinematics_node/joint_kinematics_node.hpp"
@@ -39,7 +39,7 @@ JointKinematicsNode::JointKinematicsNode()
     range_[4].set(3 * M_PI / 2,  M_PI / 2);
 
     subscription_ = this->create_subscription<sensor_msgs::msg::JointState>(
-      "/joint_states", 10,
+      "/joint_states_current", 10,
       std::bind(&JointKinematicsNode::jointStateCallback, this, std::placeholders::_1)
     );
 
@@ -49,6 +49,8 @@ JointKinematicsNode::JointKinematicsNode()
     );
 
     pub_ = this->create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
+
+    fk_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/fk_pose", 10);
 
     //timer_ = this->create_wall_timer(
     //        std::chrono::milliseconds(10),  // 每 10ms触发一次
@@ -86,7 +88,7 @@ void JointKinematicsNode::jointStateCallback(const sensor_msgs::msg::JointState:
 {
     //RCLCPP_INFO(this->get_logger(), "Received JointState:");
     for (size_t i = 0; i < msg->name.size(); ++i) {
-      RCLCPP_DEBUG(this->get_logger(), "Joint %s: position=%.2f velocity=%.2f effort=%.2f",
+      RCLCPP_INFO(this->get_logger(), "Joint %s: position=%.2f velocity=%.2f effort=%.2f",
                   msg->name[i].c_str(),
                   msg->position.size() > i ? msg->position[i] : 0.0,
                   msg->velocity.size() > i ? msg->velocity[i] : 0.0,
@@ -109,7 +111,20 @@ void JointKinematicsNode::forwardKinematics()
     Eigen::Vector3d t = T.topRightCorner(3, 1);
     RCLCPP_INFO(this->get_logger(), "q x: %.3f, y: %.3f, z: %.3f w: %.3f", q.x(), q.y(), q.z(), q.w());
 
-    //inverseKinematics(t, q);
+    // Publish FK result as PoseStamped
+    geometry_msgs::msg::PoseStamped fk_msg;
+    fk_msg.header.stamp = this->now();
+    fk_msg.header.frame_id = "base_link";
+    fk_msg.pose.position.x = t.x();
+    fk_msg.pose.position.y = t.y();
+    fk_msg.pose.position.z = t.z();
+    fk_msg.pose.orientation.x = q.x();
+    fk_msg.pose.orientation.y = q.y();
+    fk_msg.pose.orientation.z = q.z();
+    fk_msg.pose.orientation.w = q.w();
+    fk_pub_->publish(fk_msg);
+
+//    inverseKinematics(t, q);
 }
 
 void JointKinematicsNode::inverseKinematics(Eigen::Vector3d &v, Eigen::Quaterniond &q)
@@ -121,7 +136,7 @@ void JointKinematicsNode::inverseKinematics(Eigen::Vector3d &v, Eigen::Quaternio
         //Step 0
         arm6 << 0, 0, dh_server.get_d(5);
         Eigen::Vector3d j5 = v - q * arm6;
-        RCLCPP_DEBUG(this->get_logger(), "Joint5 x: %.3f, y: %.3f, z: %.3f", j5.x(), j5.y(), j5.z());
+        RCLCPP_INFO(this->get_logger(), "Joint5 x: %.3f, y: %.3f, z: %.3f", j5.x(), j5.y(), j5.z());
 
         //Step 1
         double a2 = dh_server.get_a(1);
@@ -208,7 +223,7 @@ void JointKinematicsNode::inverseKinematics(Eigen::Vector3d &v, Eigen::Quaternio
         for(size_t i = 0; i < candidate.size(); ++i){
             if(inRange(candidate[i], range_)) flag[i] = true;
         }
-
+        
         // ---- evaluate and select best solution ----
         constexpr double kPoseTol = 0.01;
         struct Eval { int idx; double pos_err; double movement; };

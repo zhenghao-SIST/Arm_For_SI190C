@@ -45,17 +45,21 @@ add_executable(joint_range_test test/joint_range_test.cpp)
 target_link_libraries(joint_range_test utility)
 ament_target_dependencies(joint_range_test rclcpp sensor_msgs)
 
+add_executable(fk_subscriber test/fk_subscriber.cpp)
+ament_target_dependencies(fk_subscriber rclcpp geometry_msgs)
+
 install(TARGETS
   joint_kinematics_node
   pose_publisher
   joint_publisher
   joint_range_test
+  fk_subscriber
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
   DIRECTORY
-  launch config
+  launch config scripts
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -16,6 +16,7 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "joint_kinematics_node/DH_server.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "utility/utility.hpp"
 
 class JointKinematicsNode: public rclcpp::Node
@@ -35,6 +36,7 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr pose_sub_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscription_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr fk_pub_;
   DHServer dh_server;
 };
 
