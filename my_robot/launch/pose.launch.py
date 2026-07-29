@@ -1,6 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 import os
 
@@ -27,6 +28,8 @@ def generate_launch_description():
     ld.add_action(rviz_arg)
 
     # This parameter has changed its meaning slightly from previous versions
+    pkg_path = FindPackageShare('my_robot')
+    urdf_path = PathJoinSubstitution([pkg_path, 'urdf', 'my.urdf'])
     ld.add_action(DeclareLaunchArgument(name='model', default_value=urdf_path,
                                         description='Path to robot urdf file relative to urdf_tutorial package'))
 
@@ -38,5 +41,25 @@ def generate_launch_description():
             'rviz_config': LaunchConfiguration('rvizconfig'),
             'jsp_gui': LaunchConfiguration('gui')}.items()
     ))
+
+    # Static transform: camera_link_optical → aruco
+    static_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_to_aruco_tf',
+        arguments=[
+            '--x', '-0.3157696',
+            '--y', '1.5723625',
+            '--z', '6.0694192',
+            '--qx', '0.0',
+            '--qy', '0.0',
+            '--qz', '0.0',
+            '--qw', '1.0',
+            '--frame-id', 'camera_link_optical',
+            '--child-frame-id', 'aruco'
+        ],
+        output='screen'
+    )
+    ld.add_action(static_tf_node)
 
     return ld

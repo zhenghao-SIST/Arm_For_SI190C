@@ -7,15 +7,28 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
-find_package(ament_cmake REQUIRED)
 find_package(xacro REQUIRED)
 
-install(DIRECTORY urdf meshes launch rviz
+install(DIRECTORY urdf meshes launch rviz models worlds config
   DESTINATION share/${PROJECT_NAME}
 )
+
+# Install meshes into the model directory so Gazebo can resolve
+# model://my_robot/meshes/... URIs in model.sdf
+install(DIRECTORY meshes/
+  DESTINATION share/${PROJECT_NAME}/models/${PROJECT_NAME}/meshes
+)
+
+# Install Python scripts
+install(PROGRAMS
+  scripts/aruco_detector.py
+  scripts/generate_aruco.py
+  scripts/joint_command_relay.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Gazebo custom plugins
+add_subdirectory(gz_plugins)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

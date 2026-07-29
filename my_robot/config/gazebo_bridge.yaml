@@ -1,0 +1,65 @@
+# Bridge configuration for ros_gz_bridge
+# Format: a YAML list of bridge definitions.
+# Each bridge maps a ROS topic/type to a Gazebo topic/type with a direction.
+
+# --- Clock: Gazebo → ROS (required for use_sim_time nodes) ---
+- ros_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_topic_name: "/clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# --- Camera: Gazebo → ROS ---
+- ros_topic_name: "/camera_sensor"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_topic_name: "/camera_sensor"
+  gz_type_name: "gz.msgs.Image"
+  direction: BIDIRECTIONAL
+  lazy: true
+
+- ros_topic_name: "/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_topic_name: "/camera_info"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: BIDIRECTIONAL
+  lazy: true
+
+# --- Joint position commands: ROS → Gazebo ---
+# The relay node publishes on ROS topics like /joint/<name>/cmd_pos.
+# Gazebo JointPositionController listens on /model/<model>/joint/<name>/0/cmd_pos
+# Setting different ros_topic_name and gz_topic_name lets us map between them.
+- ros_topic_name: "/joint/base_to_link0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/base_to_link0/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint/link0_to_link1/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/link0_to_link1/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint/link1_to_link2/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/link1_to_link2/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint/link2_to_link3/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/link2_to_link3/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint/link3_to_link4/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/link3_to_link4/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint/link4_to_link5/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_topic_name: "/model/my/joint/link4_to_link5/0/cmd_pos"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
